@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: caderno-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: caderno
+      MYSQL_USER: caderno
+      MYSQL_PASSWORD: caderno
+    ports:
+      - '127.0.0.1:3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ 'CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-ucaderno', '-pcaderno' ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:
