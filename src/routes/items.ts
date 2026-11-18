@@ -1,3 +1,4 @@
+import { isNotNil, sum } from 'es-toolkit';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as z from 'zod';
 import { HttpError } from '../errors.ts';
@@ -10,19 +11,24 @@ import {
   wantsPartial,
 } from '../http.ts';
 import { $itemInput, $itemStatus, type Item } from '../models/item.ts';
-import { sortOffersByCost } from '../models/offer.ts';
+import { $costBasis, sortOffersByCost } from '../models/offer.ts';
 import {
   clearChosenOffer,
   createItem,
   deleteItem,
   findItemById,
+  type ItemSummary,
   listItems,
   setItemStatus,
   updateItem,
 } from '../repositories/items.ts';
 import { listOffersByItem } from '../repositories/offers.ts';
 
-const $listQuery = z.object({ status: $itemStatus.optional().catch(undefined) });
+const $listQuery = z.object({
+  status: $itemStatus.optional().catch(undefined),
+  cost: $costBasis.catch('lowest'),
+});
+
 const $statusBody = z.object({ status: $itemStatus });
 
 export interface FormPage {
@@ -95,18 +101,37 @@ function renderItemForm(
   return render(reply, template, { ...page, values, errors }, statusCode);
 }
 
+// Só os itens ainda em pesquisa entram no total: comprados e desistidos não são mais gasto a prever
+function listTotal(items: readonly ItemSummary[]) {
+  const researching = items.filter((item) => item.status === 'researching');
+
+  if (researching.length === 0) {
+    return null;
+  }
+
+  const costs = researching.map((item) => item.costCents).filter(isNotNil);
+
+  return {
+    cents: costs.length > 0 ? sum(costs) : null,
+    itemCount: researching.length,
+    unpricedCount: researching.length - costs.length,
+  };
+}
+
 function editItemPage(item: Item): FormPage {
   return { heading: 'Editar item', action: itemUrl(item.id), cancelUrl: itemUrl(item.id) };
 }
 
 export async function itemRoutes(app: FastifyInstance): Promise<void> {
   app.get('/', async (request, reply) => {
-    const { status } = $listQuery.parse(request.query);
-    const items = await listItems(status);
+    const { status, cost } = $listQuery.parse(request.query);
+    const items = await listItems(status, cost);
 
     return render(reply, wantsPartial(request) ? 'items/_list' : 'items/index', {
       items,
       status: status ?? '',
+      cost,
+      total: listTotal(items),
     });
   });
 

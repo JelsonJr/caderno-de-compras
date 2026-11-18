@@ -5,13 +5,23 @@
 </div>
 
 <form method="get" action="/" class="filter" hx-get="/" hx-trigger="change" hx-target="#item-list" hx-swap="outerHTML" hx-push-url="true">
-  <label for="status-filter">Status</label>
-  <select id="status-filter" name="status">
-    <option value="">Todos</option>
-    <% for (const status of it.ITEM_STATUSES) { %>
-    <option value="<%= status %>"<% if (it.status === status) { %> selected<% } %>><%= it.ITEM_STATUS_LABELS[status] %></option>
-    <% } %>
-  </select>
+  <div class="filter__field">
+    <label for="status-filter">Status</label>
+    <select id="status-filter" name="status">
+      <option value="">Todos</option>
+      <% for (const status of it.ITEM_STATUSES) { %>
+      <option value="<%= status %>"<% if (it.status === status) { %> selected<% } %>><%= it.ITEM_STATUS_LABELS[status] %></option>
+      <% } %>
+    </select>
+  </div>
+  <div class="filter__field">
+    <label for="cost-filter">Somar pelo</label>
+    <select id="cost-filter" name="cost">
+      <% for (const basis of it.COST_BASES) { %>
+      <option value="<%= basis %>"<% if (it.cost === basis) { %> selected<% } %>><%= it.COST_BASIS_LABELS[basis] %></option>
+      <% } %>
+    </select>
+  </div>
   <noscript><button type="submit" class="button">Filtrar</button></noscript>
 </form>
 

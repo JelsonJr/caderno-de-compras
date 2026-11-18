@@ -462,7 +462,7 @@ input[type='checkbox'] {
 }
 
 .inline-form,
-.filter {
+.filter__field {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -474,6 +474,7 @@ input[type='checkbox'] {
   color: var(--muted);
   font-size: 0.9rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .inline-form select,
@@ -482,9 +483,17 @@ input[type='checkbox'] {
   width: auto;
 }
 
+/* No celular, os campos viram "contents" para os selects se alinharem numa grade */
 .filter {
-  max-width: 20rem;
-  margin-bottom: 1.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+}
+
+.filter__field {
+  display: contents;
 }
 
 .page-head,
@@ -593,7 +602,8 @@ input[type='checkbox'] {
   flex-direction: column;
 }
 
-.item-card__price small {
+.item-card__price small,
+.list-total__value small {
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -623,6 +633,38 @@ input[type='checkbox'] {
 .item-card:hover .item-card__count .icon {
   transform: translateX(4px);
   color: var(--accent);
+}
+
+.list-total {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem var(--space);
+  margin-bottom: var(--space);
+  padding: 1rem 1.15rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  animation: rise 0.35s var(--ease);
+}
+
+.list-total__value {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-total__value strong {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.list-total__count {
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .empty {
@@ -929,6 +971,18 @@ input[type='checkbox'] {
 
   .row {
     grid-template-columns: 1fr 2fr;
+  }
+
+  .filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .filter__field {
+    display: flex;
+    flex: 1 1 14rem;
+    max-width: 20rem;
   }
 }
 

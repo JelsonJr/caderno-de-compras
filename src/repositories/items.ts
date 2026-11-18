@@ -10,9 +10,9 @@ import {
   type ItemInput,
   type ItemStatus,
 } from '../models/item.ts';
-import { $offer, lowestAvailableCost, type Offer } from '../models/offer.ts';
+import { $offer, availableCost, type CostBasis, type Offer } from '../models/offer.ts';
 
-export type ItemSummary = Item & { offerCount: number; lowestCostCents: number | null };
+export type ItemSummary = Item & { offerCount: number; costCents: number | null };
 
 const $itemWithCount = $item.extend({ offerCount: z.int().nonnegative() });
 
@@ -25,8 +25,11 @@ const $offerCost = $offer.pick({
   available: true,
 });
 
-// O menor custo é calculado em JS (computeOfferCost) para seguir a mesma regra da página do item
-export async function listItems(status?: ItemStatus): Promise<ItemSummary[]> {
+// O custo é calculado em JS (computeOfferCost) para seguir a mesma regra da página do item
+export async function listItems(
+  status: ItemStatus | undefined,
+  basis: CostBasis,
+): Promise<ItemSummary[]> {
   const rows = await db
     .select({
       ...getTableColumns(items),
@@ -65,7 +68,7 @@ export async function listItems(status?: ItemStatus): Promise<ItemSummary[]> {
 
   const summaries = list.map((item) => ({
     ...item,
-    lowestCostCents: lowestAvailableCost(costsByItem.get(item.id) ?? []),
+    costCents: availableCost(costsByItem.get(item.id) ?? [], basis),
   }));
 
   return orderBy(summaries, [(item) => ITEM_STATUSES.indexOf(item.status), 'id'], ['asc', 'desc']);

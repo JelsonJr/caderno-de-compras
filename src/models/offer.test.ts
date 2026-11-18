@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   $offerInput,
+  availableCost,
   computeOfferCost,
-  lowestAvailableCost,
   type Offer,
   sortOffersByCost,
 } from './offer.ts';
@@ -127,17 +127,35 @@ await test('ordenação: não altera o array recebido', () => {
   );
 });
 
-await test('menor custo da lista: só ofertas disponíveis e com valor', () => {
+await test('custo da lista: menor, maior e média das ofertas disponíveis e com valor', () => {
   const offers = [
     { ...noValues, priceCents: 1000, available: false },
     { ...noValues, available: true },
     { ...noValues, priceCents: 5000, shippingCents: 500, available: true },
     { ...noValues, installments: 2, installmentCents: 2000, available: true },
+    { ...noValues, priceCents: 4001, available: true },
   ];
 
-  assert.equal(lowestAvailableCost(offers), 4000);
-  assert.equal(lowestAvailableCost([]), null);
-  assert.equal(lowestAvailableCost([{ ...noValues, available: true }]), null);
+  assert.equal(availableCost(offers, 'lowest'), 4000);
+  assert.equal(availableCost(offers, 'highest'), 5500);
+  assert.equal(availableCost(offers, 'average'), 4500);
+});
+
+await test('custo da lista: média arredonda para o centavo mais próximo', () => {
+  const offers = [
+    { ...noValues, priceCents: 1000, available: true },
+    { ...noValues, priceCents: 1001, available: true },
+  ];
+
+  assert.equal(availableCost(offers, 'average'), 1001);
+});
+
+await test('custo da lista: sem oferta disponível com valor é null', () => {
+  for (const basis of ['lowest', 'highest', 'average'] as const) {
+    assert.equal(availableCost([], basis), null);
+    assert.equal(availableCost([{ ...noValues, available: true }], basis), null);
+    assert.equal(availableCost([{ ...noValues, priceCents: 1000, available: false }], basis), null);
+  }
 });
 
 await test('formulário de oferta: parcelas e valor da parcela andam juntos', () => {

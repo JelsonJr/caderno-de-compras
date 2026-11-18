@@ -2,6 +2,17 @@
   <% if (it.items.length === 0) { %>
   <p class="empty"><%= it.status ? 'Nenhum item com este status.' : 'Nenhum item cadastrado ainda.' %></p>
   <% } else { %>
+  <% if (it.total) { %>
+  <div class="list-total">
+    <span class="list-total__value">
+      <small>Total pelo <%= it.COST_BASIS_LABELS[it.cost].toLowerCase() %></small>
+      <strong><%= it.total.cents === null ? '—' : it.formatMoney(it.total.cents) %></strong>
+    </span>
+    <span class="list-total__count">
+      <%= it.plural(it.total.itemCount, 'item em pesquisa', 'itens em pesquisa') %><% if (it.total.unpricedCount > 0) { %> · <%= it.total.unpricedCount %> sem preço, fora do total<% } %>
+    </span>
+  </div>
+  <% } %>
   <ul class="item-list">
     <% for (const [index, item] of it.items.entries()) { %>
     <li style="--i: <%= index %>">
@@ -12,8 +23,8 @@
         </span>
         <span class="item-card__foot">
           <span class="item-card__price">
-            <small>menor custo</small>
-            <strong><%= item.lowestCostCents === null ? '—' : it.formatMoney(item.lowestCostCents) %></strong>
+            <small><%= it.COST_BASIS_LABELS[it.cost] %></small>
+            <strong><%= item.costCents === null ? '—' : it.formatMoney(item.costCents) %></strong>
           </span>
           <span class="item-card__count">
             <%= it.plural(item.offerCount, 'oferta', 'ofertas') %>

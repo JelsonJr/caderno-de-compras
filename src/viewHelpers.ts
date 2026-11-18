@@ -1,5 +1,12 @@
 import { ITEM_STATUS_LABELS, ITEM_STATUSES } from './models/item.ts';
-import { CONDITION_LABELS, CONDITIONS, type Offer, type OfferCost } from './models/offer.ts';
+import {
+  CONDITION_LABELS,
+  CONDITIONS,
+  COST_BASES,
+  COST_BASIS_LABELS,
+  type Offer,
+  type OfferCost,
+} from './models/offer.ts';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -54,4 +61,6 @@ export const viewHelpers = {
   ITEM_STATUS_LABELS,
   CONDITIONS,
   CONDITION_LABELS,
+  COST_BASES,
+  COST_BASIS_LABELS,
 };

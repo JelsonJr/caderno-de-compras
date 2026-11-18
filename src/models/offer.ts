@@ -1,4 +1,4 @@
-import { isNotNil, sortBy } from 'es-toolkit';
+import { isNotNil, mean, sortBy } from 'es-toolkit';
 import * as z from 'zod';
 import { checkbox, optionalInt, optionalMoney, optionalText, optionalUrl } from './formFields.ts';
 
@@ -120,13 +120,37 @@ export function sortOffersByCost(offers: readonly Offer[]): OfferWithCost[] {
   ]);
 }
 
-export function lowestAvailableCost(
+export const COST_BASES = ['lowest', 'highest', 'average'] as const;
+export const $costBasis = z.enum(COST_BASES);
+export type CostBasis = z.infer<typeof $costBasis>;
+
+export const COST_BASIS_LABELS = {
+  lowest: 'Menor custo',
+  highest: 'Maior custo',
+  average: 'Custo médio',
+} as const satisfies Record<CostBasis, string>;
+
+// Custo do item na lista: considera só as ofertas disponíveis e com valor
+export function availableCost(
   offers: readonly (CostFields & Pick<Offer, 'available'>)[],
+  basis: CostBasis,
 ): number | null {
   const costs = offers
     .filter((offer) => offer.available)
     .map((offer) => computeOfferCost(offer).totalCents)
     .filter(isNotNil);
 
-  return costs.length > 0 ? Math.min(...costs) : null;
+  if (costs.length === 0) {
+    return null;
+  }
+
+  if (basis === 'lowest') {
+    return Math.min(...costs);
+  }
+
+  if (basis === 'highest') {
+    return Math.max(...costs);
+  }
+
+  return Math.round(mean(costs));
 }
