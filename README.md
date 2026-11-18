@@ -2,13 +2,15 @@
 
 App pessoal para anotar o que quero comprar (ex.: sofá) e comparar ofertas de cada item: loja ou
 pessoa, link, preço à vista, parcelamento, frete, condição, local e observações. A página do item
-ordena as ofertas pelo custo total, destaca a mais barata e marca a escolhida.
+ordena as ofertas pelo custo total, destaca a mais barata e marca a escolhida. A lista mostra o
+custo de cada item (menor, maior ou médio entre as ofertas disponíveis) e a soma dos itens que
+ainda estão em pesquisa.
 
 Um único usuário, com login por senha. Feito para usar principalmente pelo celular.
 
-**Stack:** Node 24 (ESM, TypeScript 6), Fastify 5, MySQL 8.4 (dev) / MariaDB 11 (produção) com
-Drizzle ORM sobre mysql2, zod 4, es-toolkit, templates Eta com htmx 2 servido localmente, CSS
-próprio.
+**Stack:** Node 24 (ESM, TypeScript 6), Fastify 5, MySQL 8.4 (dev) / MariaDB 11 (produção na
+Hostinger, que o hPanel chama de MySQL) com Drizzle ORM sobre mysql2, zod 4, es-toolkit, templates
+Eta com htmx 2 servido localmente, CSS próprio.
 
 ## Rodando localmente
 
@@ -66,6 +68,8 @@ src/
   errors.ts        HttpError e páginas de erro (404, 429, 5xx...)
   http.ts          helpers de resposta (render, redirect pós-POST, htmx, formulários)
   config.ts        variáveis de ambiente validadas (único lugar que lê process.env)
+  viewHelpers.ts   formatação usada nos templates (dinheiro, parcelamento, plural)
+  zodLocale.ts     mensagens de validação do zod em português
   db/              conexão (pool + Drizzle), schema do Drizzle e runner de migrations
   models/          schemas zod, regra de custo total
   repositories/    consultas com o Drizzle (parâmetros sempre como placeholders)
@@ -109,8 +113,11 @@ próprio LiteSpeed; host e porta passados ao `listen` são ignorados.
 
 ### 1. Banco de dados
 
-No hPanel, em **Bancos de dados → Gerenciamento**, crie um banco MariaDB com usuário e senha
-(a Hostinger acrescenta um prefixo como `u123456789_` ao nome e ao usuário). Anote os três.
+No hPanel, em **Bancos de dados → Gerenciamento**, crie um banco MySQL com usuário e senha (a
+Hostinger acrescenta um prefixo como `u123456789_` ao nome e ao usuário). Anote os três.
+
+O hPanel chama de MySQL, mas nos planos de hospedagem web o servidor é MariaDB. Para conferir a
+versão, rode `SELECT VERSION();` no phpMyAdmin (ex.: `11.8.x-MariaDB`).
 
 As tabelas são criadas pelas migrations no primeiro start; não é preciso importar nada.
 
@@ -193,7 +200,7 @@ de `src/cli/` podem usar top-level await, porque rodam direto com `node`.
 - **Sessão:** o cookie guarda só a data de expiração, assinada com o `SESSION_SECRET`, e vale por
   7 dias. Não há sessão no servidor: sair apaga o cookie só naquele navegador, e trocar a senha não
   derruba as sessões abertas. Para derrubar todas, troque o `SESSION_SECRET`.
-- **Limites:** 5 tentativas de login a cada 15 minutos por IP e 30 requisições por minuto por IP
+- **Limites:** 5 tentativas de login a cada 15 minutos por IP e 300 requisições por minuto por IP
   no resto do site. Ambos dependem do `TRUST_PROXY` correto.
 - **CSRF:** toda requisição que altera dados (POST) precisa vir do próprio site
   (`Sec-Fetch-Site` ou `Origin`); alterações e exclusões nunca são feitas por GET.
