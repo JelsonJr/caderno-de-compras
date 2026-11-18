@@ -12,6 +12,7 @@ import Fastify from 'fastify';
 import { env, isProduction } from './config.ts';
 import { db, pool } from './db/client.ts';
 import { errorHandler, notFoundHandler } from './errors.ts';
+import { preventCaching } from './http.ts';
 import { authRoutes } from './routes/auth.ts';
 import { itemRoutes } from './routes/items.ts';
 import { offerRoutes } from './routes/offers.ts';
@@ -30,6 +31,8 @@ export async function buildApp() {
     trustProxy: buildTrustProxy(env.TRUST_PROXY),
     bodyLimit: 100 * 1024,
   });
+
+  app.addHook('onSend', preventCaching);
 
   await app.register(helmet, {
     contentSecurityPolicy: { directives: { upgradeInsecureRequests: isProduction ? [] : null } },

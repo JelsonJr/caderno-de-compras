@@ -106,6 +106,20 @@ await test('cookie de sessão adulterado não dá acesso', async () => {
   assert.equal(response.headers.location, '/login');
 });
 
+// O CDN da Hostinger guardava o redirect "/ -> /login" e causava loop depois do login
+await test('respostas dinâmicas não podem ser guardadas em cache; estáticos podem', async () => {
+  for (const url of ['/', '/login', '/nao-existe']) {
+    const response = await app.inject({ method: 'GET', url });
+
+    assert.equal(response.headers['cache-control'], 'private, no-store', url);
+  }
+
+  const css = await app.inject({ method: 'GET', url: '/static/app.css' });
+
+  assert.equal(css.statusCode, 200);
+  assert.match(String(css.headers['cache-control']), /^public/);
+});
+
 await test('página inexistente vira HTML 404', async () => {
   const response = await app.inject({ method: 'GET', url: '/nao-existe' });
   assert.equal(response.statusCode, 404);

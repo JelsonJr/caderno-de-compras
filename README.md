@@ -200,12 +200,13 @@ de `src/cli/` podem usar top-level await, porque rodam direto com `node`.
 
 ## Problemas comuns
 
-| Sintoma                                             | Causa provável e solução                                                            |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Log: `Variáveis de ambiente inválidas`              | O log diz qual variável. Corrija no painel e reinicie.                              |
-| Log: `ECONNREFUSED ::1:3306`                        | `localhost` resolveu para IPv6. Use `DB_HOST=127.0.0.1`.                            |
-| Log: `ER_ACCESS_DENIED_ERROR`                       | Usuário ou senha do banco errados, ou o usuário não está ligado ao banco no hPanel. |
-| Log: `Migrations: FALHA em ...`                     | Veja a seção "Banco e migrations".                                                  |
-| Erro 503 e `ERR_REQUIRE_ASYNC_MODULE` no log        | Algum módulo importado pelo `server.ts` passou a usar top-level await.              |
-| "Muitas tentativas" no login sem ter errado a senha | O `TRUST_PROXY` não está pegando o IP real (passo 4 do deploy).                     |
-| Build falha com `tsc: not found`                    | `typescript` saiu das `dependencies`.                                               |
+| Sintoma                                             | Causa provável e solução                                                                                                          |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Log: `Variáveis de ambiente inválidas`              | O log diz qual variável. Corrija no painel e reinicie.                                                                            |
+| Log: `ECONNREFUSED ::1:3306`                        | `localhost` resolveu para IPv6. Use `DB_HOST=127.0.0.1`.                                                                          |
+| Log: `ER_ACCESS_DENIED_ERROR`                       | Usuário ou senha do banco errados, ou o usuário não está ligado ao banco no hPanel.                                               |
+| Log: `Migrations: FALHA em ...`                     | Veja a seção "Banco e migrations".                                                                                                |
+| Erro 503 e `ERR_REQUIRE_ASYNC_MODULE` no log        | Algum módulo importado pelo `server.ts` passou a usar top-level await.                                                            |
+| "Muitas tentativas" no login sem ter errado a senha | O `TRUST_PROXY` não está pegando o IP real (passo 4 do deploy).                                                                   |
+| Build falha com `tsc: not found`                    | `typescript` saiu das `dependencies`.                                                                                             |
+| "Redirecionamento em excesso" depois do login       | O CDN da Hostinger guardou um redirect antigo. O app já manda `Cache-Control: private, no-store`; limpe o cache do CDN no hPanel. |

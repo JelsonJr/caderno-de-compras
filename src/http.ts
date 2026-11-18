@@ -17,6 +17,14 @@ export function isHtmx(request: FastifyRequest): boolean {
   return request.headers['hx-request'] === 'true';
 }
 
+// O CDN da Hostinger guarda respostas sem Cache-Control, inclusive redirects: um "/ -> /login"
+// guardado de antes do login deixava o navegador em loop. Os estáticos mantêm o cache deles.
+export async function preventCaching(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!reply.hasHeader('cache-control')) {
+    reply.header('cache-control', 'private, no-store');
+  }
+}
+
 // Ao restaurar o histórico (voltar sem cache), o htmx pede a página inteira, não o trecho
 export function wantsPartial(request: FastifyRequest): boolean {
   return isHtmx(request) && request.headers['hx-history-restore-request'] !== 'true';
