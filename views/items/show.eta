@@ -1,0 +1,3 @@
+<% layout('/layout', { title: it.item.name, loggedIn: true }) %>
+<a class="back" href="/"><%~ include('/partials/icon', { name: 'back' }) %>Itens</a>
+<%~ include('/items/_detail', it) %>

@@ -1,0 +1,5 @@
+{
+  // Build de produção: igual ao tsconfig.json, mas sem os testes (que não vão para dist/)
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts"]
+}

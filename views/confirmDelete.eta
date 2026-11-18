@@ -1,0 +1,9 @@
+<% layout('/layout', { title: 'Confirmar exclusão', loggedIn: true }) %>
+<section class="card narrow">
+  <h1><%= it.title %></h1>
+  <p><%= it.description %></p>
+  <form method="post" action="<%= it.action %>" class="actions">
+    <button type="submit" class="button danger">Sim, excluir</button>
+    <a class="button" href="<%= it.cancelUrl %>">Cancelar</a>
+  </form>
+</section>

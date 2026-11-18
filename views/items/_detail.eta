@@ -1,0 +1,117 @@
+<%/* Os hx-post de dentro herdam o alvo: este div é trocado inteiro a cada ação. */%>
+<% const itemUrl = '/items/' + it.item.id %>
+<div id="item-detail" hx-target="this" hx-swap="outerHTML">
+  <section class="card item-head">
+    <div class="item-head__title">
+      <h1><%= it.item.name %></h1>
+      <span class="badge badge--<%= it.item.status %>"><%= it.ITEM_STATUS_LABELS[it.item.status] %></span>
+    </div>
+    <% if (it.item.notes) { %>
+    <p class="notes"><%= it.item.notes %></p>
+    <% } %>
+
+    <div class="item-head__bar">
+      <form method="post" action="<%= itemUrl %>/status" class="inline-form" hx-post="<%= itemUrl %>/status" hx-trigger="change">
+        <label for="item-status">Status</label>
+        <select id="item-status" name="status">
+          <% for (const status of it.ITEM_STATUSES) { %>
+          <option value="<%= status %>"<% if (it.item.status === status) { %> selected<% } %>><%= it.ITEM_STATUS_LABELS[status] %></option>
+          <% } %>
+        </select>
+        <noscript><button type="submit" class="button small">Salvar</button></noscript>
+      </form>
+
+      <div class="actions">
+        <a class="button small" href="<%= itemUrl %>/edit">Editar item</a>
+        <a class="button small danger" href="<%= itemUrl %>/delete" hx-post="<%= itemUrl %>/delete" hx-confirm="Excluir este item e todas as ofertas dele? Não dá para desfazer.">Excluir item</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Ofertas<% if (it.offers.length > 0) { %> <span class="count"><%= it.offers.length %></span><% } %></h2>
+      <a class="button primary" href="<%= itemUrl %>/offers/new"><%~ include('/partials/icon', { name: 'plus' }) %>Nova oferta</a>
+    </div>
+
+    <% if (it.offers.length === 0) { %>
+    <p class="empty">Nenhuma oferta ainda.</p>
+    <% } else { %>
+    <ol class="offer-list">
+      <% for (const offer of it.offers) { %>
+      <% const chosen = offer.id === it.item.chosenOfferId %>
+      <% const cheapest = offer.id === it.cheapestOfferId %>
+      <% const offerUrl = '/offers/' + offer.id %>
+      <li class="offer<%= cheapest ? ' offer--cheapest' : '' %><%= chosen ? ' offer--chosen' : '' %><%= offer.available ? '' : ' offer--unavailable' %>">
+        <div class="offer__head">
+          <strong class="offer__seller"><%= offer.seller %></strong>
+          <span class="offer__badges">
+            <% if (chosen) { %><span class="badge badge--chosen">Escolhida</span><% } %>
+            <% if (cheapest) { %><span class="badge badge--cheapest">Mais barata</span><% } %>
+            <% if (!offer.available) { %><span class="badge">Indisponível</span><% } %>
+          </span>
+        </div>
+
+        <p class="offer__total">
+          <% if (offer.cost.totalCents === null) { %>
+          <small>Sem valor informado</small>
+          <% } else { %>
+          <%= it.formatMoney(offer.cost.totalCents) %> <small>custo total</small>
+          <% } %>
+        </p>
+
+        <dl class="offer__details">
+          <% if (offer.priceCents !== null) { %>
+          <div><dt>À vista</dt><dd><%= it.formatMoney(offer.priceCents) %></dd></div>
+          <% } %>
+          <% if (offer.cost.installmentTotalCents !== null) { %>
+          <div>
+            <dt>Parcelado</dt>
+            <dd><%= it.installmentText(offer) %> <small>(total <%= it.formatMoney(offer.cost.installmentTotalCents) %>)</small></dd>
+          </div>
+          <% } %>
+          <div>
+            <dt>Frete</dt>
+            <dd><%= offer.shippingCents === null ? 'não informado' : offer.shippingCents === 0 ? 'grátis' : it.formatMoney(offer.shippingCents) %></dd>
+          </div>
+          <% if (offer.condition) { %>
+          <div><dt>Condição</dt><dd><%= it.CONDITION_LABELS[offer.condition] %></dd></div>
+          <% } %>
+          <% if (offer.location) { %>
+          <div><dt>Local</dt><dd><%= offer.location %></dd></div>
+          <% } %>
+        </dl>
+
+        <% if (offer.notes) { %>
+        <p class="notes"><%= offer.notes %></p>
+        <% } %>
+        <% if (offer.url) { %>
+        <a class="offer__link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">Abrir anúncio<%~ include('/partials/icon', { name: 'external' }) %></a>
+        <% } %>
+
+        <div class="offer__actions">
+          <% if (chosen) { %>
+          <form method="post" action="<%= itemUrl %>/unchoose" hx-post="<%= itemUrl %>/unchoose">
+            <button type="submit" class="button small">Desfazer escolha</button>
+          </form>
+          <% } else { %>
+          <form method="post" action="<%= offerUrl %>/choose" hx-post="<%= offerUrl %>/choose">
+            <button type="submit" class="button small soft">Escolher</button>
+            <% if (it.item.status !== 'bought') { %>
+            <button type="submit" class="button small soft" name="markBought" value="on">Escolher e marcar comprado</button>
+            <% } %>
+          </form>
+          <% } %>
+          <form method="post" action="<%= offerUrl %>/availability" hx-post="<%= offerUrl %>/availability">
+            <input type="hidden" name="available" value="<%= offer.available ? 'false' : 'true' %>">
+            <button type="submit" class="button small"><%= offer.available ? 'Marcar indisponível' : 'Marcar disponível' %></button>
+          </form>
+          <a class="button small" href="<%= offerUrl %>/edit">Editar</a>
+          <a class="button small danger" href="<%= offerUrl %>/delete" hx-post="<%= offerUrl %>/delete" hx-confirm="Excluir a oferta de <%= offer.seller %>?">Excluir</a>
+        </div>
+      </li>
+      <% } %>
+    </ol>
+    <% } %>
+  </section>
+</div>

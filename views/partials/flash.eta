@@ -1,0 +1,1 @@
+<p class="flash" role="alert"><strong><%= it.heading %>.</strong> <%= it.message %></p>

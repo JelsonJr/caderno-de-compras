@@ -1,0 +1,5 @@
+<% layout('/layout', { title: it.heading, loggedIn: true }) %>
+<div class="form-page">
+  <a class="back" href="<%= it.cancelUrl %>"><%~ include('/partials/icon', { name: 'back' }) %>Voltar</a>
+  <%~ include('/items/_form', it) %>
+</div>

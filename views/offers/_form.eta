@@ -1,0 +1,41 @@
+<% const money = { inputmode: 'decimal', placeholder: '1.299,90' } %>
+<form id="offer-form" method="post" action="<%= it.action %>" hx-post="<%= it.action %>" hx-target="this" hx-swap="outerHTML" class="card stack">
+  <h1><%= it.heading %> <small>· <%= it.item.name %></small></h1>
+
+  <%~ include('/partials/field', { name: 'seller', label: 'Loja ou vendedor', value: it.values.seller, error: it.errors.seller, required: true, maxlength: 120 }) %>
+  <%~ include('/partials/field', { name: 'url', label: 'Link', type: 'url', value: it.values.url, error: it.errors.url, maxlength: 2048, placeholder: 'https://', inputmode: 'url' }) %>
+  <%~ include('/partials/field', { ...money, name: 'price', label: 'Preço à vista', hint: '(R$)', value: it.values.price, error: it.errors.price }) %>
+
+  <fieldset class="stack">
+    <legend>Parcelamento</legend>
+    <div class="row">
+      <%~ include('/partials/field', { name: 'installments', label: 'Parcelas', value: it.values.installments, error: it.errors.installments, inputmode: 'numeric', placeholder: '12' }) %>
+      <%~ include('/partials/field', { ...money, name: 'installmentValue', label: 'Valor da parcela', hint: '(R$)', value: it.values.installmentValue, error: it.errors.installmentValue }) %>
+    </div>
+    <div class="field field--checkbox">
+      <label><input type="checkbox" name="interestFree"<% if (it.values.interestFree === 'on') { %> checked<% } %>> Sem juros</label>
+      <% if (it.errors.interestFree) { %><p class="field-error"><%= it.errors.interestFree %></p><% } %>
+    </div>
+  </fieldset>
+
+  <%~ include('/partials/field', { ...money, name: 'shipping', label: 'Frete', hint: '(R$, deixe vazio se não souber; 0 = grátis)', value: it.values.shipping, error: it.errors.shipping }) %>
+
+  <div class="field<%= it.errors.condition ? ' field--error' : '' %>">
+    <label for="f-condition">Condição</label>
+    <select id="f-condition" name="condition">
+      <option value="">Não informada</option>
+      <% for (const condition of it.CONDITIONS) { %>
+      <option value="<%= condition %>"<% if (it.values.condition === condition) { %> selected<% } %>><%= it.CONDITION_LABELS[condition] %></option>
+      <% } %>
+    </select>
+    <% if (it.errors.condition) { %><p class="field-error"><%= it.errors.condition %></p><% } %>
+  </div>
+
+  <%~ include('/partials/field', { name: 'location', label: 'Local', value: it.values.location, error: it.errors.location, maxlength: 120, placeholder: 'Ex.: Centro, retirar em mãos' }) %>
+  <%~ include('/partials/field', { name: 'notes', label: 'Observações', type: 'textarea', value: it.values.notes, error: it.errors.notes, maxlength: 2000 }) %>
+
+  <div class="actions">
+    <button type="submit" class="button primary">Salvar</button>
+    <a class="button" href="<%= it.cancelUrl %>">Cancelar</a>
+  </div>
+</form>

@@ -1,0 +1,14 @@
+<%/* Dados: name, label, value, error, type (text, url, textarea...), hint, required, maxlength,
+   inputmode, placeholder, autocomplete */%>
+<% const id = 'f-' + it.name %>
+<div class="field<%= it.error ? ' field--error' : '' %>">
+  <label for="<%= id %>"><%= it.label %><% if (it.hint) { %> <small><%= it.hint %></small><% } %></label>
+  <% if (it.type === 'textarea') { %>
+  <textarea id="<%= id %>" name="<%= it.name %>" rows="4"<% if (it.maxlength) { %> maxlength="<%= it.maxlength %>"<% } %><% if (it.error) { %> aria-invalid="true" aria-describedby="<%= id %>-error"<% } %>><%= it.value ?? '' %></textarea>
+  <% } else { %>
+  <input id="<%= id %>" name="<%= it.name %>" type="<%= it.type ?? 'text' %>" value="<%= it.value ?? '' %>"<% if (it.required) { %> required<% } %><% if (it.maxlength) { %> maxlength="<%= it.maxlength %>"<% } %><% if (it.inputmode) { %> inputmode="<%= it.inputmode %>"<% } %><% if (it.placeholder) { %> placeholder="<%= it.placeholder %>"<% } %><% if (it.autocomplete) { %> autocomplete="<%= it.autocomplete %>"<% } %><% if (it.error) { %> aria-invalid="true" aria-describedby="<%= id %>-error"<% } %>>
+  <% } %>
+  <% if (it.error) { %>
+  <p class="field-error" id="<%= id %>-error"><%= it.error %></p>
+  <% } %>
+</div>

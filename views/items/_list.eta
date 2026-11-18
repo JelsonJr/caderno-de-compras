@@ -1,0 +1,28 @@
+<div id="item-list">
+  <% if (it.items.length === 0) { %>
+  <p class="empty"><%= it.status ? 'Nenhum item com este status.' : 'Nenhum item cadastrado ainda.' %></p>
+  <% } else { %>
+  <ul class="item-list">
+    <% for (const [index, item] of it.items.entries()) { %>
+    <li style="--i: <%= index %>">
+      <a class="item-card" href="/items/<%= item.id %>">
+        <span class="item-card__head">
+          <span class="item-card__name"><%= item.name %></span>
+          <span class="badge badge--<%= item.status %>"><%= it.ITEM_STATUS_LABELS[item.status] %></span>
+        </span>
+        <span class="item-card__foot">
+          <span class="item-card__price">
+            <small>menor custo</small>
+            <strong><%= item.lowestCostCents === null ? '—' : it.formatMoney(item.lowestCostCents) %></strong>
+          </span>
+          <span class="item-card__count">
+            <%= it.plural(item.offerCount, 'oferta', 'ofertas') %>
+            <%~ include('/partials/icon', { name: 'chevron' }) %>
+          </span>
+        </span>
+      </a>
+    </li>
+    <% } %>
+  </ul>
+  <% } %>
+</div>

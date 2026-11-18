@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <%/* Config do htmx sem script inline (a CSP bloqueia). responseHandling: troca o conteúdo
+       também em 422 (validação) e nos erros redirecionados para #flash. */%>
+    <meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false,"includeIndicatorStyles":false,"historyCacheSize":0,"globalViewTransitions":true,"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true},{"code":"403","swap":false,"error":true},{"code":"[45]..","swap":true,"error":true}]}'>
+    <title><%= it.title %> · Caderno de Compras</title>
+    <link rel="stylesheet" href="/static/app.css">
+    <script src="/vendor/htmx/htmx.min.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="/">
+          <span class="brand__logo"><%~ include('/partials/icon', { name: 'logo' }) %></span>
+          Caderno de Compras
+        </a>
+        <% if (it.loggedIn) { %>
+        <form method="post" action="/logout">
+          <button type="submit" class="button small ghost"><%~ include('/partials/icon', { name: 'logout' }) %>Sair</button>
+        </form>
+        <% } %>
+      </div>
+    </header>
+    <div id="flash" aria-live="polite"></div>
+    <main>
+<%~ it.body %>
+    </main>
+  </body>
+</html>

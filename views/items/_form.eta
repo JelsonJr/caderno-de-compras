@@ -1,0 +1,9 @@
+<form id="item-form" method="post" action="<%= it.action %>" hx-post="<%= it.action %>" hx-target="this" hx-swap="outerHTML" class="card stack">
+  <h1><%= it.heading %></h1>
+  <%~ include('/partials/field', { name: 'name', label: 'Nome', value: it.values.name, error: it.errors.name, required: true, maxlength: 120, placeholder: 'Ex.: sofá 3 lugares' }) %>
+  <%~ include('/partials/field', { name: 'notes', label: 'Observações', type: 'textarea', value: it.values.notes, error: it.errors.notes, maxlength: 2000 }) %>
+  <div class="actions">
+    <button type="submit" class="button primary">Salvar</button>
+    <a class="button" href="<%= it.cancelUrl %>">Cancelar</a>
+  </div>
+</form>
